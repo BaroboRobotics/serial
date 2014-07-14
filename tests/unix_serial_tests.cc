@@ -18,7 +18,7 @@ void loop()
 */
 
 #include <string>
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include <boost/bind.hpp>
 

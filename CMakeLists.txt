@@ -1,27 +1,11 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(serial)
 
-# Find catkin
-find_package(catkin REQUIRED)
+option(BUILD_TESTS "Build unit tests. Requires gtest" OFF)
 
 if(APPLE)
 	find_library(IOKIT_LIBRARY IOKit)
 	find_library(FOUNDATION_LIBRARY Foundation)
-endif()
-
-if(UNIX AND NOT APPLE)
-    # If Linux, add rt and pthread
-    catkin_package(
-        LIBRARIES ${PROJECT_NAME}
-        INCLUDE_DIRS include
-        DEPENDS rt pthread
-    )
-else()
-    # Otherwise normal call
-    catkin_package(
-        LIBRARIES ${PROJECT_NAME}
-        INCLUDE_DIRS include
-    )
 endif()
 
 ## Sources
@@ -59,17 +43,35 @@ target_link_libraries(serial_example ${PROJECT_NAME})
 ## Include headers
 include_directories(include)
 
+if(UNIX)
+  set(INSTALL_LIB_DIR lib)
+  set(INSTALL_BIN_DIR bin)
+else()
+  set(INSTALL_LIB_DIR .)
+  set(INSTALL_BIN_DIR .)
+endif()
+
+set(install_args)
+if(NOT BUILD_SHARED_LIBS)
+  list(APPEND install_args ARCHIVE DESTINATION ${INSTALL_LIB_DIR})
+endif()
 ## Install executable
 install(TARGETS ${PROJECT_NAME}
-    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    ${install_args}
+    LIBRARY DESTINATION ${INSTALL_LIB_DIR}
 )
 
-## Install headers
-install(FILES include/serial/serial.h include/serial/v8stdint.h
-  DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/serial)
+if(BUILD_TESTS)
+    if(NOT DEFINED ENV{GTEST_DIR})
+        message(FATAL_ERROR "BUILD_TESTS set, but GTEST_DIR envvar not found!")
+    endif()
 
-## Tests
-if(CATKIN_ENABLE_TESTING)
     add_subdirectory(tests)
 endif()
+## Install headers
+#install(FILES include/serial/serial.h include/serial/v8stdint.h
+#  DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/serial)
+
+## Tests
+#if(CATKIN_ENABLE_TESTING)
+#endif()
