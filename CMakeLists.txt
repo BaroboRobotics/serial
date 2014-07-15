@@ -22,9 +22,11 @@ elseif(UNIX)
     # If unix
     list(APPEND serial_SRCS src/impl/unix.cc)
     list(APPEND serial_SRCS src/impl/list_ports/list_ports_linux.cc)
-elseif()
+else()
     # If windows
     list(APPEND serial_SRCS src/impl/win.cc)
+    list(APPEND serial_SRCS src/impl/list_ports/list_ports_win.cc)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
 ## Add serial library
@@ -33,6 +35,8 @@ if(APPLE)
 	target_link_libraries(${PROJECT_NAME} ${FOUNDATION_LIBRARY} ${IOKIT_LIBRARY})
 elseif(UNIX)
 	target_link_libraries(${PROJECT_NAME} rt pthread)
+else()
+	target_link_libraries(${PROJECT_NAME} setupapi)
 endif()
 
 ## Uncomment for example
