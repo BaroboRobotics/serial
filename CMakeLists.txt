@@ -55,14 +55,10 @@ else()
   set(INSTALL_BIN_DIR .)
 endif()
 
-set(install_args)
-if(NOT BUILD_SHARED_LIBS)
-  list(APPEND install_args ARCHIVE DESTINATION ${INSTALL_LIB_DIR})
-endif()
 ## Install executable
 install(TARGETS ${PROJECT_NAME}
-    ${install_args}
     LIBRARY DESTINATION ${INSTALL_LIB_DIR}
+    ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
 )
 
 if(BUILD_TESTS)
